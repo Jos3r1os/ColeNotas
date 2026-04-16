@@ -21,7 +21,7 @@ import androidx.navigation.compose.rememberNavController
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun RegistroEventoAdministracionScreen(navController: NavHostController) {
+fun AvisosAdministracionScreen(navController: NavHostController) {
 
     var nombreEvento by remember { mutableStateOf("") }
     var fecha by remember { mutableStateOf("") }
@@ -62,7 +62,7 @@ fun RegistroEventoAdministracionScreen(navController: NavHostController) {
 
         HorizontalDivider()
 
-        Spacer(modifier = Modifier.height(55.dp))
+        Spacer(modifier = Modifier.height(85.dp))
 
         Column(
             modifier = Modifier
@@ -79,20 +79,20 @@ fun RegistroEventoAdministracionScreen(navController: NavHostController) {
             ) {
 
                 Text(
-                    text = "Registrar Evento",
+                    text = "Mandar un mensaje",
                     fontSize = 18.sp,
                     fontWeight = FontWeight.Bold
                 )
                 Spacer(modifier = Modifier.height(8.dp))
 
                 Text(
-                    text = "Registra el evento",
+                    text = "Algo importante que decir?",
                     fontSize = 12.sp,
                     color = Color.Gray,
                     modifier = Modifier.padding(bottom = 16.dp)
                 )
 
-                Text("Evento", fontSize = 13.sp, color = Color.DarkGray)
+                Text("Titulo", fontSize = 13.sp, color = Color.DarkGray)
                 Spacer(modifier = Modifier.height(4.dp))
                 OutlinedTextField(
                     value = nombreEvento,
@@ -176,7 +176,7 @@ fun RegistroEventoAdministracionScreen(navController: NavHostController) {
                             checkedColor = Color.Black
                         )
                     )
-                    Text("Todo el día?", fontSize = 14.sp)
+                    Text("Marcar como urgente", fontSize = 14.sp)
                 }
 
                 Spacer(modifier = Modifier.height(16.dp))
@@ -192,26 +192,7 @@ fun RegistroEventoAdministracionScreen(navController: NavHostController) {
                     )
                 ) {
                     Text(
-                        text = "Guardar evento",
-                        color = Color.White,
-                        fontWeight = FontWeight.Medium
-                    )
-                }
-
-                Spacer(modifier = Modifier.height(16.dp))
-
-                Button(
-                    onClick = { },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(48.dp),
-                    shape = RoundedCornerShape(8.dp),
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = Color.Red
-                    )
-                ) {
-                    Text(
-                        text = "Asignar a todos los maestros",
+                        text = "Enviar mensaje",
                         color = Color.White,
                         fontWeight = FontWeight.Medium
                     )
@@ -223,6 +204,6 @@ fun RegistroEventoAdministracionScreen(navController: NavHostController) {
 
 @Preview(showBackground = true, showSystemUi = true)
 @Composable
-fun RegistroEventoAdministracionScreenPreview() {
-    RegistroEventoAdministracionScreen(navController = rememberNavController())
+fun AvisosAdministracionScreenPreview() {
+    AvisosAdministracionScreen(navController = rememberNavController())
 }
