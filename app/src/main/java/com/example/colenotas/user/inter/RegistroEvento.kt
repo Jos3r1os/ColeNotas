@@ -16,12 +16,12 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.navigation.NavHostController
+import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun RegistroEventoScreen(navController: NavHostController) {
+fun RegistroEventoScreen(navController: NavController) {
 
     var nombreEvento by remember { mutableStateOf("") }
     var fecha by remember { mutableStateOf("") }
@@ -35,11 +35,8 @@ fun RegistroEventoScreen(navController: NavHostController) {
             .fillMaxSize()
             .background(Color.White)
     ) {
-
         Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp),
+            modifier = Modifier.fillMaxWidth().padding(16.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
             Box(
@@ -48,20 +45,13 @@ fun RegistroEventoScreen(navController: NavHostController) {
                     .background(Color(0xFFDDDDDD), RoundedCornerShape(50)),
                 contentAlignment = Alignment.Center
             ) {
-                Text("IMG")
+                Text("🏫", fontSize = 20.sp)
             }
-
             Spacer(modifier = Modifier.width(8.dp))
-
-            Text(
-                text = "Calendario Ciclo 2026",
-                fontSize = 18.sp,
-                fontWeight = FontWeight.Bold
-            )
+            Text(text = "Calendario Ciclo 2026", fontSize = 18.sp, fontWeight = FontWeight.Bold)
         }
 
         HorizontalDivider()
-
         Spacer(modifier = Modifier.height(85.dp))
 
         Column(
@@ -70,27 +60,15 @@ fun RegistroEventoScreen(navController: NavHostController) {
                 .verticalScroll(rememberScrollState())
                 .padding(16.dp)
         ) {
-
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
                     .border(1.dp, Color.LightGray, RoundedCornerShape(12.dp))
                     .padding(16.dp)
             ) {
-
-                Text(
-                    text = "Registrar Evento",
-                    fontSize = 18.sp,
-                    fontWeight = FontWeight.Bold
-                )
+                Text("Registrar Evento", fontSize = 18.sp, fontWeight = FontWeight.Bold)
                 Spacer(modifier = Modifier.height(8.dp))
-
-                Text(
-                    text = "Registra el evento",
-                    fontSize = 12.sp,
-                    color = Color.Gray,
-                    modifier = Modifier.padding(bottom = 16.dp)
-                )
+                Text("Registra el evento", fontSize = 12.sp, color = Color.Gray, modifier = Modifier.padding(bottom = 16.dp))
 
                 Text("Evento", fontSize = 13.sp, color = Color.DarkGray)
                 Spacer(modifier = Modifier.height(4.dp))
@@ -112,42 +90,28 @@ fun RegistroEventoScreen(navController: NavHostController) {
                     onValueChange = {},
                     readOnly = true,
                     placeholder = { Text("dd/mm/yyyy", color = Color.LightGray) },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .clickable { calendarioPicker = true },
+                    modifier = Modifier.fillMaxWidth().clickable { calendarioPicker = true },
                     enabled = false,
-                    shape = RoundedCornerShape(8.dp),
-
+                    shape = RoundedCornerShape(8.dp)
                 )
 
                 if (calendarioPicker) {
                     DatePickerDialog(
                         onDismissRequest = { calendarioPicker = false },
                         confirmButton = {
-                            TextButton(
-                                onClick = {
-                                    val millis = datePickerState.selectedDateMillis
-                                    if (millis != null) {
-                                        val sdf = java.text.SimpleDateFormat(
-                                            "dd/MM/yyyy",
-                                            java.util.Locale.getDefault()
-                                        )
-                                        fecha = sdf.format(java.util.Date(millis))
-                                    }
-                                    calendarioPicker = false
+                            TextButton(onClick = {
+                                val millis = datePickerState.selectedDateMillis
+                                if (millis != null) {
+                                    val sdf = java.text.SimpleDateFormat("dd/MM/yyyy", java.util.Locale.getDefault())
+                                    fecha = sdf.format(java.util.Date(millis))
                                 }
-                            ) {
-                                Text("Confirmar")
-                            }
+                                calendarioPicker = false
+                            }) { Text("Confirmar") }
                         },
                         dismissButton = {
-                            TextButton(onClick = { calendarioPicker = false }) {
-                                Text("Cancelar")
-                            }
+                            TextButton(onClick = { calendarioPicker = false }) { Text("Cancelar") }
                         }
-                    ) {
-                        DatePicker(state = datePickerState)
-                    }
+                    ) { DatePicker(state = datePickerState) }
                 }
 
                 Spacer(modifier = Modifier.height(12.dp))
@@ -158,23 +122,18 @@ fun RegistroEventoScreen(navController: NavHostController) {
                     value = comentario,
                     onValueChange = { comentario = it },
                     placeholder = { Text("...", color = Color.LightGray) },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(100.dp),
+                    modifier = Modifier.fillMaxWidth().height(100.dp),
                     shape = RoundedCornerShape(8.dp),
                     maxLines = 5
                 )
 
                 Spacer(modifier = Modifier.height(12.dp))
 
-
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Checkbox(
                         checked = todoElDia,
                         onCheckedChange = { todoElDia = it },
-                        colors = CheckboxDefaults.colors(
-                            checkedColor = Color.Black
-                        )
+                        colors = CheckboxDefaults.colors(checkedColor = Color.Black)
                     )
                     Text("Todo el día?", fontSize = 14.sp)
                 }
@@ -182,20 +141,12 @@ fun RegistroEventoScreen(navController: NavHostController) {
                 Spacer(modifier = Modifier.height(16.dp))
 
                 Button(
-                    onClick = { },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(48.dp),
+                    onClick = { navController.popBackStack() },
+                    modifier = Modifier.fillMaxWidth().height(48.dp),
                     shape = RoundedCornerShape(8.dp),
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = Color.Black
-                    )
+                    colors = ButtonDefaults.buttonColors(containerColor = Color.Black)
                 ) {
-                    Text(
-                        text = "Guardar evento",
-                        color = Color.White,
-                        fontWeight = FontWeight.Medium
-                    )
+                    Text("Guardar evento", color = Color.White, fontWeight = FontWeight.Medium)
                 }
             }
         }

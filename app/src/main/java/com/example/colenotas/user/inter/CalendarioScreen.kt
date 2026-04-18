@@ -16,12 +16,10 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.navigation.NavController
-import androidx.navigation.compose.rememberNavController
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun RegistroEventoAdministracionScreen(navController: NavController) {
+fun CalendarioScreen() {
 
     var nombreEvento by remember { mutableStateOf("") }
     var fecha by remember { mutableStateOf("") }
@@ -35,8 +33,12 @@ fun RegistroEventoAdministracionScreen(navController: NavController) {
             .fillMaxSize()
             .background(Color.White)
     ) {
+
+        // ─── HEADER ───────────────────────────────────
         Row(
-            modifier = Modifier.fillMaxWidth().padding(16.dp),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
             Box(
@@ -48,12 +50,48 @@ fun RegistroEventoAdministracionScreen(navController: NavController) {
                 Text("🏫", fontSize = 20.sp)
             }
             Spacer(modifier = Modifier.width(8.dp))
-            Text(text = "Calendario Ciclo 2026", fontSize = 18.sp, fontWeight = FontWeight.Bold)
+            Text(
+                text = "Calendario Ciclo 2026",
+                fontSize = 18.sp,
+                fontWeight = FontWeight.Bold
+            )
         }
 
         HorizontalDivider()
-        Spacer(modifier = Modifier.height(55.dp))
 
+        // ─── NAVEGACIÓN MES / AÑO ─────────────────────
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp, vertical = 8.dp),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text("<", fontSize = 18.sp, fontWeight = FontWeight.Bold)
+
+            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                Box(
+                    modifier = Modifier
+                        .background(Color(0xFFEEEEEE), RoundedCornerShape(4.dp))
+                        .padding(horizontal = 12.dp, vertical = 4.dp)
+                ) {
+                    Text("Abr ▾", fontSize = 14.sp)
+                }
+                Box(
+                    modifier = Modifier
+                        .background(Color(0xFFEEEEEE), RoundedCornerShape(4.dp))
+                        .padding(horizontal = 12.dp, vertical = 4.dp)
+                ) {
+                    Text("2026 ▾", fontSize = 14.sp)
+                }
+            }
+
+            Text(">", fontSize = 18.sp, fontWeight = FontWeight.Bold)
+        }
+
+        HorizontalDivider()
+
+        // ─── FORMULARIO ───────────────────────────────
         Column(
             modifier = Modifier
                 .weight(1f)
@@ -67,9 +105,14 @@ fun RegistroEventoAdministracionScreen(navController: NavController) {
                     .padding(16.dp)
             ) {
                 Text("Registrar Evento", fontSize = 18.sp, fontWeight = FontWeight.Bold)
-                Spacer(modifier = Modifier.height(8.dp))
-                Text("Registra el evento", fontSize = 12.sp, color = Color.Gray, modifier = Modifier.padding(bottom = 16.dp))
+                Text(
+                    "Registra el evento",
+                    fontSize = 12.sp,
+                    color = Color.Gray,
+                    modifier = Modifier.padding(bottom = 16.dp)
+                )
 
+                // ── Campo Evento ──────────────────────
                 Text("Evento", fontSize = 13.sp, color = Color.DarkGray)
                 Spacer(modifier = Modifier.height(4.dp))
                 OutlinedTextField(
@@ -83,6 +126,7 @@ fun RegistroEventoAdministracionScreen(navController: NavController) {
 
                 Spacer(modifier = Modifier.height(12.dp))
 
+                // ── Campo Fecha ───────────────────────
                 Text("Fecha", fontSize = 13.sp, color = Color.DarkGray)
                 Spacer(modifier = Modifier.height(4.dp))
                 OutlinedTextField(
@@ -90,9 +134,14 @@ fun RegistroEventoAdministracionScreen(navController: NavController) {
                     onValueChange = {},
                     readOnly = true,
                     placeholder = { Text("dd/mm/yyyy", color = Color.LightGray) },
-                    modifier = Modifier.fillMaxWidth().clickable { calendarioPicker = true },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clickable { calendarioPicker = true },
                     enabled = false,
-                    shape = RoundedCornerShape(8.dp)
+                    shape = RoundedCornerShape(8.dp),
+                    trailingIcon = {
+                        Text("📅", fontSize = 16.sp, modifier = Modifier.padding(end = 8.dp))
+                    }
                 )
 
                 if (calendarioPicker) {
@@ -102,33 +151,42 @@ fun RegistroEventoAdministracionScreen(navController: NavController) {
                             TextButton(onClick = {
                                 val millis = datePickerState.selectedDateMillis
                                 if (millis != null) {
-                                    val sdf = java.text.SimpleDateFormat("dd/MM/yyyy", java.util.Locale.getDefault())
+                                    val sdf = java.text.SimpleDateFormat(
+                                        "dd/MM/yyyy",
+                                        java.util.Locale.getDefault()
+                                    )
                                     fecha = sdf.format(java.util.Date(millis))
                                 }
                                 calendarioPicker = false
                             }) { Text("Confirmar") }
                         },
                         dismissButton = {
-                            TextButton(onClick = { calendarioPicker = false }) { Text("Cancelar") }
+                            TextButton(onClick = { calendarioPicker = false }) {
+                                Text("Cancelar")
+                            }
                         }
                     ) { DatePicker(state = datePickerState) }
                 }
 
                 Spacer(modifier = Modifier.height(12.dp))
 
+                // ── Campo Comentario ──────────────────
                 Text("Comentario", fontSize = 13.sp, color = Color.DarkGray)
                 Spacer(modifier = Modifier.height(4.dp))
                 OutlinedTextField(
                     value = comentario,
                     onValueChange = { comentario = it },
                     placeholder = { Text("...", color = Color.LightGray) },
-                    modifier = Modifier.fillMaxWidth().height(100.dp),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(100.dp),
                     shape = RoundedCornerShape(8.dp),
                     maxLines = 5
                 )
 
                 Spacer(modifier = Modifier.height(12.dp))
 
+                // ── Checkbox Todo el día ──────────────
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Checkbox(
                         checked = todoElDia,
@@ -140,24 +198,16 @@ fun RegistroEventoAdministracionScreen(navController: NavController) {
 
                 Spacer(modifier = Modifier.height(16.dp))
 
+                // ── Botón Guardar ─────────────────────
                 Button(
-                    onClick = { navController.popBackStack() },
-                    modifier = Modifier.fillMaxWidth().height(48.dp),
+                    onClick = {},
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(48.dp),
                     shape = RoundedCornerShape(8.dp),
                     colors = ButtonDefaults.buttonColors(containerColor = Color.Black)
                 ) {
-                    Text("Guardar evento", color = Color.White, fontWeight = FontWeight.Medium)
-                }
-
-                Spacer(modifier = Modifier.height(16.dp))
-
-                Button(
-                    onClick = {},
-                    modifier = Modifier.fillMaxWidth().height(48.dp),
-                    shape = RoundedCornerShape(8.dp),
-                    colors = ButtonDefaults.buttonColors(containerColor = Color.Red)
-                ) {
-                    Text("Asignar a todos los maestros", color = Color.White, fontWeight = FontWeight.Medium)
+                    Text("Guardar evento!", color = Color.White, fontWeight = FontWeight.Medium)
                 }
             }
         }
@@ -166,6 +216,6 @@ fun RegistroEventoAdministracionScreen(navController: NavController) {
 
 @Preview(showBackground = true, showSystemUi = true)
 @Composable
-fun RegistroEventoAdministracionScreenPreview() {
-    RegistroEventoAdministracionScreen(navController = rememberNavController())
+fun CalendarioScreenPreview() {
+    MaterialTheme { CalendarioScreen() }
 }

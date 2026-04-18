@@ -9,23 +9,19 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.text.input.PasswordVisualTransformation
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
-import com.example.colenotas.R
-
 
 @Composable
 fun LoginScreen(navController: NavController) {
     var usuario by remember { mutableStateOf("") }
     var contra by remember { mutableStateOf("") }
+    var error by remember { mutableStateOf("") }
 
     Column(
         modifier = Modifier
@@ -42,11 +38,7 @@ fun LoginScreen(navController: NavController) {
                 .background(Color.LightGray, shape = RoundedCornerShape(16.dp)),
             contentAlignment = Alignment.Center
         ) {
-            Text(
-                text = "Logo",
-                fontSize = 16.sp,
-                fontWeight = FontWeight.Bold
-            )
+            Text(text = "Logo", fontSize = 16.sp, fontWeight = FontWeight.Bold)
         }
 
         Spacer(modifier = Modifier.height(20.dp))
@@ -62,7 +54,7 @@ fun LoginScreen(navController: NavController) {
         OutlinedTextField(
             value = usuario,
             onValueChange = { usuario = it },
-            placeholder = { Text("Ingresa tu usuario", color = Color.LightGray)},
+            placeholder = { Text("Ingresa tu usuario", color = Color.LightGray) },
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
             modifier = Modifier.fillMaxWidth(),
             singleLine = true
@@ -72,44 +64,55 @@ fun LoginScreen(navController: NavController) {
 
         OutlinedTextField(
             value = contra,
-            onValueChange = {contra = it },
-            placeholder = {Text("Ingresa tu contraseña", color = Color.LightGray)},
+            onValueChange = { contra = it },
+            placeholder = { Text("Ingresa tu contraseña", color = Color.LightGray) },
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
             modifier = Modifier.fillMaxWidth(),
             singleLine = true
-
         )
 
-        Spacer(modifier = Modifier.height(25.dp))
+        Spacer(modifier = Modifier.height(12.dp))
+
+        if (error.isNotEmpty()) {
+            Text(text = error, color = Color.Red, fontSize = 13.sp)
+        }
+
+        Spacer(modifier = Modifier.height(12.dp))
 
         Button(
-            onClick = {},
-            modifier = Modifier.fillMaxWidth()
-                .height(50.dp),
+            onClick = {
+                when {
+                    usuario == "admin" && contra == "admin123" -> {
+                        navController.navigate("homeAdmin") {
+                            popUpTo("login") { inclusive = true }
+                        }
+                    }
+                    usuario == "docente" && contra == "docente123" -> {
+                        navController.navigate("homeDocente") {
+                            popUpTo("login") { inclusive = true }
+                        }
+                    }
+                    else -> {
+                        error = "Usuario o contraseña incorrectos"
+                    }
+                }
+            },
+            modifier = Modifier.fillMaxWidth().height(50.dp),
             shape = RoundedCornerShape(8.dp),
             colors = ButtonDefaults.buttonColors(containerColor = Color.DarkGray)
         ) {
-            Text(
-                text = "Ingresar",
-                fontSize = 20.sp,
-                fontWeight = FontWeight.ExtraBold
-            )
+            Text(text = "Ingresar", fontSize = 20.sp, fontWeight = FontWeight.ExtraBold)
         }
 
         Spacer(modifier = Modifier.height(25.dp))
 
         Button(
             onClick = {},
-            modifier = Modifier.fillMaxWidth()
-                .height(50.dp),
+            modifier = Modifier.fillMaxWidth().height(50.dp),
             shape = RoundedCornerShape(8.dp),
             colors = ButtonDefaults.buttonColors(containerColor = Color.DarkGray)
         ) {
-            Text(
-                text = "Ingresar con Google",
-                fontSize = 20.sp,
-                fontWeight = FontWeight.ExtraBold
-            )
+            Text(text = "Ingresar con Google", fontSize = 20.sp, fontWeight = FontWeight.ExtraBold)
         }
     }
 }

@@ -15,61 +15,29 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.navigation.compose.rememberNavController
 
-//modelo de datos
-data class Curso(
-    val nombre: String,
-    val cantidad: String   // ej. "A", "B"
-)
+data class Curso(val nombre: String, val cantidad: String)
+data class Docente(val nombre: String, val ciclo: String, val cantidad: String, val cursos: List<Curso>)
 
-data class Docente(
-    val nombre: String,
-    val ciclo: String,
-    val cantidad: String,  // número que aparece a la derecha ej. "3"
-    val cursos: List<Curso>
-)
-
-//datos de prueba
 val docentesPrueba = listOf(
-    Docente(
-        nombre = "Ingeniero Figueroa",
-        ciclo = "Ciclo 2026",
-        cantidad = "3",
-        cursos = listOf(
-            Curso("Calculo I", "A"),
-            Curso("Calculo II", "A"),
-            Curso("Calculo III", "A")
-        )
-    ),
-    Docente(
-        nombre = "Ingeniero Solis",
-        ciclo = "Ciclo 2026",
-        cantidad = "4",
-        cursos = emptyList()
-    ),
-    Docente(
-        nombre = "Ingeniero Guzman",
-        ciclo = "Ciclo 2026",
-        cantidad = "3",
-        cursos = emptyList()
-    )
+    Docente("Ingeniero Figueroa", "Ciclo 2026", "3", listOf(
+        Curso("Calculo I", "A"),
+        Curso("Calculo II", "A"),
+        Curso("Calculo III", "A")
+    )),
+    Docente("Ingeniero Solis", "Ciclo 2026", "4", emptyList()),
+    Docente("Ingeniero Guzman", "Ciclo 2026", "3", emptyList())
 )
 
 @Composable
 fun CursosAdminScreen() {
-
     Column(
         modifier = Modifier
             .fillMaxSize()
             .background(Color.White)
     ) {
-
-
         Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp),
+            modifier = Modifier.fillMaxWidth().padding(16.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
             Box(
@@ -80,14 +48,8 @@ fun CursosAdminScreen() {
             ) {
                 Text("🏫", fontSize = 20.sp)
             }
-
             Spacer(modifier = Modifier.width(8.dp))
-
-            Text(
-                text = "Tus cursos",
-                fontSize = 18.sp,
-                fontWeight = FontWeight.Bold
-            )
+            Text(text = "Tus cursos", fontSize = 18.sp, fontWeight = FontWeight.Bold)
         }
 
         HorizontalDivider()
@@ -98,19 +60,13 @@ fun CursosAdminScreen() {
                 .verticalScroll(rememberScrollState())
                 .padding(horizontal = 16.dp, vertical = 12.dp)
         ) {
-
-            Text(
-                text = "Tus cursos",
-                fontSize = 12.sp,
-                color = Color.Gray
-            )
+            Text(text = "Tus cursos", fontSize = 12.sp, color = Color.Gray)
             Text(
                 text = "Administracion 2026",
                 fontSize = 15.sp,
                 fontWeight = FontWeight.Bold,
                 modifier = Modifier.padding(bottom = 12.dp)
             )
-
             docentesPrueba.forEach { docente ->
                 DocenteItem(docente = docente)
                 Spacer(modifier = Modifier.height(8.dp))
@@ -121,11 +77,9 @@ fun CursosAdminScreen() {
 
 @Composable
 fun DocenteItem(docente: Docente) {
-
     var expandido by remember { mutableStateOf(docente.cursos.isNotEmpty()) }
 
     Column {
-
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -138,34 +92,18 @@ fun DocenteItem(docente: Docente) {
                 Text("☆", fontSize = 18.sp, color = Color.Gray)
                 Spacer(modifier = Modifier.width(8.dp))
                 Column {
-                    Text(
-                        text = docente.nombre,
-                        fontSize = 15.sp,
-                        fontWeight = FontWeight.Medium
-                    )
-                    Text(
-                        text = docente.ciclo,
-                        fontSize = 12.sp,
-                        color = Color.Gray
-                    )
+                    Text(docente.nombre, fontSize = 15.sp, fontWeight = FontWeight.Medium)
+                    Text(docente.ciclo, fontSize = 12.sp, color = Color.Gray)
                 }
             }
-
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Text("☆", fontSize = 14.sp, color = Color.Gray)
-                Text(
-                    text = docente.cantidad,
-                    fontSize = 14.sp,
-                    color = Color.Gray
-                )
+                Text(docente.cantidad, fontSize = 14.sp, color = Color.Gray)
             }
         }
 
-
         if (expandido) {
-            docente.cursos.forEach { curso ->
-                CursoItem(curso = curso)
-            }
+            docente.cursos.forEach { curso -> AdminCursoItem(curso = curso) }
         }
 
         HorizontalDivider(color = Color(0xFFEEEEEE))
@@ -173,7 +111,7 @@ fun DocenteItem(docente: Docente) {
 }
 
 @Composable
-fun CursoItem(curso: Curso) {
+fun AdminCursoItem(curso: Curso) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -185,32 +123,19 @@ fun CursoItem(curso: Curso) {
             Text("☆", fontSize = 16.sp, color = Color.Gray)
             Spacer(modifier = Modifier.width(8.dp))
             Column {
-                Text(
-                    text = curso.nombre,
-                    fontSize = 14.sp,
-                    fontWeight = FontWeight.Medium
-                )
-                Text(
-                    text = "Ver notas",
-                    fontSize = 12.sp,
-                    color = Color.Gray
-                )
+                Text(curso.nombre, fontSize = 14.sp, fontWeight = FontWeight.Medium)
+                Text("Ver notas", fontSize = 12.sp, color = Color.Gray)
             }
         }
-
         Row(verticalAlignment = Alignment.CenterVertically) {
             Text("☆", fontSize = 14.sp, color = Color.Gray)
-            Text(
-                text = curso.cantidad,
-                fontSize = 14.sp,
-                color = Color.Gray
-            )
+            Text(curso.cantidad, fontSize = 14.sp, color = Color.Gray)
         }
     }
 }
 
 @Preview(showBackground = true, showSystemUi = true)
 @Composable
-fun CursoItemPreview() {
-    //CursoItem(navController = rememberNavController())
+fun CursosAdminPreview() {
+    MaterialTheme { CursosAdminScreen() }
 }

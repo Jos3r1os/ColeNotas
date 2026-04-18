@@ -2,7 +2,6 @@ package com.example.colenotas.user.inter
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -13,22 +12,16 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import androidx.navigation.compose.rememberNavController
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AvisosAdministracionScreen(navController: NavController) {
+fun MandarAvisoScreen(navController: NavController) {
 
     var titulo by remember { mutableStateOf("") }
-    var fecha by remember { mutableStateOf("") }
-    var comentario by remember { mutableStateOf("") }
+    var mensaje by remember { mutableStateOf("") }
     var urgente by remember { mutableStateOf(false) }
-    var calendarioPicker by remember { mutableStateOf(false) }
-    val datePickerState = rememberDatePickerState()
 
     Column(
         modifier = Modifier
@@ -50,7 +43,7 @@ fun AvisosAdministracionScreen(navController: NavController) {
                 Text("🏫", fontSize = 20.sp)
             }
             Spacer(modifier = Modifier.width(8.dp))
-            Text(text = "Avisos Administración", fontSize = 18.sp, fontWeight = FontWeight.Bold)
+            Text("Mandar Aviso", fontSize = 18.sp, fontWeight = FontWeight.Bold)
         }
 
         HorizontalDivider()
@@ -68,7 +61,6 @@ fun AvisosAdministracionScreen(navController: NavController) {
                     .padding(16.dp)
             ) {
                 Text("Mandar un mensaje", fontSize = 18.sp, fontWeight = FontWeight.Bold)
-                Spacer(modifier = Modifier.height(8.dp))
                 Text(
                     "¿Algo importante que decir?",
                     fontSize = 12.sp,
@@ -76,7 +68,7 @@ fun AvisosAdministracionScreen(navController: NavController) {
                     modifier = Modifier.padding(bottom = 16.dp)
                 )
 
-                Text("Titulo", fontSize = 13.sp, color = Color.DarkGray)
+                Text("Título", fontSize = 13.sp, color = Color.DarkGray)
                 Spacer(modifier = Modifier.height(4.dp))
                 OutlinedTextField(
                     value = titulo,
@@ -89,55 +81,17 @@ fun AvisosAdministracionScreen(navController: NavController) {
 
                 Spacer(modifier = Modifier.height(12.dp))
 
-                Text("Fecha", fontSize = 13.sp, color = Color.DarkGray)
+                Text("Mensaje", fontSize = 13.sp, color = Color.DarkGray)
                 Spacer(modifier = Modifier.height(4.dp))
                 OutlinedTextField(
-                    value = fecha,
-                    onValueChange = {},
-                    readOnly = true,
-                    placeholder = { Text("dd/mm/yyyy", color = Color.LightGray) },
+                    value = mensaje,
+                    onValueChange = { mensaje = it },
+                    placeholder = { Text("Escribe el mensaje...", color = Color.LightGray) },
                     modifier = Modifier
                         .fillMaxWidth()
-                        .clickable { calendarioPicker = true },
-                    enabled = false,
-                    shape = RoundedCornerShape(8.dp)
-                )
-
-                if (calendarioPicker) {
-                    DatePickerDialog(
-                        onDismissRequest = { calendarioPicker = false },
-                        confirmButton = {
-                            TextButton(onClick = {
-                                val millis = datePickerState.selectedDateMillis
-                                if (millis != null) {
-                                    val sdf = java.text.SimpleDateFormat(
-                                        "dd/MM/yyyy",
-                                        java.util.Locale.getDefault()
-                                    )
-                                    fecha = sdf.format(java.util.Date(millis))
-                                }
-                                calendarioPicker = false
-                            }) { Text("Confirmar") }
-                        },
-                        dismissButton = {
-                            TextButton(onClick = { calendarioPicker = false }) {
-                                Text("Cancelar")
-                            }
-                        }
-                    ) { DatePicker(state = datePickerState) }
-                }
-
-                Spacer(modifier = Modifier.height(12.dp))
-
-                Text("Comentario", fontSize = 13.sp, color = Color.DarkGray)
-                Spacer(modifier = Modifier.height(4.dp))
-                OutlinedTextField(
-                    value = comentario,
-                    onValueChange = { comentario = it },
-                    placeholder = { Text("...", color = Color.LightGray) },
-                    modifier = Modifier.fillMaxWidth().height(100.dp),
+                        .height(120.dp),
                     shape = RoundedCornerShape(8.dp),
-                    maxLines = 5
+                    maxLines = 6
                 )
 
                 Spacer(modifier = Modifier.height(12.dp))
@@ -155,7 +109,9 @@ fun AvisosAdministracionScreen(navController: NavController) {
 
                 Button(
                     onClick = { navController.popBackStack() },
-                    modifier = Modifier.fillMaxWidth().height(48.dp),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(48.dp),
                     shape = RoundedCornerShape(8.dp),
                     colors = ButtonDefaults.buttonColors(containerColor = Color.Black)
                 ) {
@@ -164,10 +120,4 @@ fun AvisosAdministracionScreen(navController: NavController) {
             }
         }
     }
-}
-
-@Preview(showBackground = true, showSystemUi = true)
-@Composable
-fun AvisosAdministracionScreenPreview() {
-    AvisosAdministracionScreen(navController = rememberNavController())
 }
