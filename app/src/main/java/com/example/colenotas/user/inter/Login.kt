@@ -1,124 +1,72 @@
 package com.example.colenotas.user.inter
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import androidx.navigation.compose.rememberNavController
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
 
 @Composable
 fun LoginScreen(navController: NavController) {
     var usuario by remember { mutableStateOf("") }
     var contra by remember { mutableStateOf("") }
     var error by remember { mutableStateOf("") }
+    var isLoading by remember { mutableStateOf(false) }
 
     Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(Color.White)
-            .padding(horizontal = 32.dp),
+        modifier = Modifier.fillMaxSize().padding(32.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
+        OutlinedTextField(value = usuario, onValueChange = { usuario = it }, label = { Text("Correo") }, modifier = Modifier.fillMaxWidth())
+        Spacer(modifier = Modifier.height(16.dp))
+        OutlinedTextField(value = contra, onValueChange = { contra = it }, label = { Text("Contraseña") }, keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password), modifier = Modifier.fillMaxWidth())
 
-        Box(
-            modifier = Modifier
-                .size(120.dp)
-                .background(Color.LightGray, shape = RoundedCornerShape(16.dp)),
-            contentAlignment = Alignment.Center
-        ) {
-            Text(text = "Logo", fontSize = 16.sp, fontWeight = FontWeight.Bold)
-        }
+        Spacer(modifier = Modifier.height(16.dp))
 
-        Spacer(modifier = Modifier.height(20.dp))
+        if (error.isNotEmpty()) Text(text = error, color = Color.Red)
 
-        Text(
-            text = "Conocimiento para la vida \nEducacion con corazon.",
-            fontSize = 20.sp,
-            fontWeight = FontWeight.ExtraBold
-        )
+        if (isLoading) {
+            CircularProgressIndicator()
+        } else {
+            Button(
+                onClick = {
+                    isLoading = true
+                    val credenciales = mapOf("correo" to usuario, "clave" to contra)
 
-        Spacer(modifier = Modifier.height(100.dp))
-
-        OutlinedTextField(
-            value = usuario,
-            onValueChange = { usuario = it },
-            placeholder = { Text("Ingresa tu usuario", color = Color.LightGray) },
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
-            modifier = Modifier.fillMaxWidth(),
-            singleLine = true
-        )
-
-        Spacer(modifier = Modifier.height(25.dp))
-
-        OutlinedTextField(
-            value = contra,
-            onValueChange = { contra = it },
-            placeholder = { Text("Ingresa tu contraseña", color = Color.LightGray) },
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
-            modifier = Modifier.fillMaxWidth(),
-            singleLine = true
-        )
-
-        Spacer(modifier = Modifier.height(12.dp))
-
-        if (error.isNotEmpty()) {
-            Text(text = error, color = Color.Red, fontSize = 13.sp)
-        }
-
-        Spacer(modifier = Modifier.height(12.dp))
-
-        Button(
-            onClick = {
-                when {
-                    usuario == "admin" && contra == "admin123" -> {
-                        navController.navigate("homeAdmin") {
-                            popUpTo("login") { inclusive = true }
+                    RetrofitClient.instance.login(credenciales).enqueue(object : Callback<UsuarioRespuesta> {
+                        override fun onResponse(call: Call<UsuarioRespuesta>, response: Response<UsuarioRespuesta>) {
+                            isLoading = false
+                            if (response.isSuccessful) {
+                                val user = response.body()
+                                if (user?.rol == "admin") {
+                                    navController.navigate("homeAdmin")
+                                } else {
+                                    navController.navigate("homeDocente")
+                                }
+                            } else {
+                                error = "Credenciales incorrectas"
+                            }
                         }
-                    }
-                    usuario == "docente" && contra == "docente123" -> {
-                        navController.navigate("homeDocente") {
-                            popUpTo("login") { inclusive = true }
+
+                        override fun onFailure(call: Call<UsuarioRespuesta>, t: Throwable) {
+                            isLoading = false
+                            error = "Error: " + t.message
                         }
-                    }
-                    else -> {
-                        error = "Usuario o contraseña incorrectos"
-                    }
-                }
-            },
-            modifier = Modifier.fillMaxWidth().height(50.dp),
-            shape = RoundedCornerShape(8.dp),
-            colors = ButtonDefaults.buttonColors(containerColor = Color.DarkGray)
-        ) {
-            Text(text = "Ingresar", fontSize = 20.sp, fontWeight = FontWeight.ExtraBold)
-        }
-
-        Spacer(modifier = Modifier.height(25.dp))
-
-        Button(
-            onClick = {},
-            modifier = Modifier.fillMaxWidth().height(50.dp),
-            shape = RoundedCornerShape(8.dp),
-            colors = ButtonDefaults.buttonColors(containerColor = Color.DarkGray)
-        ) {
-            Text(text = "Ingresar con Google", fontSize = 20.sp, fontWeight = FontWeight.ExtraBold)
+                    })
+                },
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text("Ingresar")
+            }
         }
     }
-}
-
-@Preview(showBackground = true, showSystemUi = true)
-@Composable
-fun LoginScreenPreview() {
-    LoginScreen(navController = rememberNavController())
 }
