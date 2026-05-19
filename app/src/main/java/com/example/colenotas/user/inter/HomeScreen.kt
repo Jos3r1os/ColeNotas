@@ -15,7 +15,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
 @Composable
-fun HomeScreen() {
+fun HomeScreen(nombre: String = "") {
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -50,7 +50,11 @@ fun HomeScreen() {
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             Text(text = "Inicio", fontSize = 14.sp, color = Color.Gray)
-            Text(text = "Ingeniero Figueroa", fontSize = 18.sp, fontWeight = FontWeight.Bold)
+            Text(
+                text = nombre.ifEmpty { "Docente" },
+                fontSize = 18.sp,
+                fontWeight = FontWeight.Bold
+            )
 
             Card(
                 shape = RoundedCornerShape(12.dp),

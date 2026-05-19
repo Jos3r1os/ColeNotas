@@ -1,8 +1,11 @@
 package com.example.colenotas.user.inter
 
-data class UsuarioRespuesta(
+data class UsuarioData(
     val id: Int,
-    val correo: String,
-    val rol: String,
-    val nombre_completo: String
+    val nombre: String? = null,
+    val rol: String
+)
+data class UsuarioRespuesta(
+    val mensaje: String,
+    val usuario: UsuarioData
 )

@@ -11,7 +11,9 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.navigation.NavController
+import androidx.navigation.NavType
 import androidx.navigation.compose.*
+import androidx.navigation.navArgument
 import com.example.colenotas.ui.theme.ColeNotasTheme
 import com.example.colenotas.user.inter.*
 
@@ -47,9 +49,13 @@ fun MainApp() {
     val currentRoute = navController
         .currentBackStackEntryAsState().value?.destination?.route
 
+    val mostrarBottomNav = rutasSinBottomNav.none { ruta ->
+        currentRoute?.startsWith(ruta) == true
+    }
+
     Scaffold(
         bottomBar = {
-            if (currentRoute !in rutasSinBottomNav) {
+            if (mostrarBottomNav) {
                 BottomNavDocente(navController = navController)
             }
         }
@@ -62,9 +68,15 @@ fun MainApp() {
             composable("login") {
                 LoginScreen(navController = navController)
             }
-            composable("homeDocente") {
-                HomeScreen()
+
+            composable(
+                route = "homeDocente/{nombre}",
+                arguments = listOf(navArgument("nombre") { type = NavType.StringType })
+            ) { backStackEntry ->
+                val nombre = backStackEntry.arguments?.getString("nombre") ?: ""
+                HomeScreen(nombre = nombre)
             }
+
             composable("cursos") {
                 VentanaCursosScreen()
             }
@@ -86,9 +98,15 @@ fun MainApp() {
             composable("asignarNotasNotificar") {
                 AsignarNotasNotificarScreen()
             }
-            composable("homeAdmin") {
-                HomeAdminScreen(navController = navController)
+
+            composable(
+                route = "homeAdmin/{nombre}",
+                arguments = listOf(navArgument("nombre") { type = NavType.StringType })
+            ) { backStackEntry ->
+                val nombre = backStackEntry.arguments?.getString("nombre") ?: ""
+                HomeAdminScreen(navController = navController, nombre = nombre)
             }
+
             composable("cursosAdmin") {
                 CursosAdminScreen()
             }
@@ -118,10 +136,10 @@ fun BottomNavDocente(navController: NavController) {
 
     NavigationBar(containerColor = Color.White) {
         NavigationBarItem(
-            selected = currentRoute == "perfil",
-            onClick = { navController.navigate("perfil") },
-            icon = { Icon(Icons.Default.Person, contentDescription = "Perfil") },
-            label = { Text("Perfil") },
+            selected = currentRoute?.startsWith("homeDocente") == true,
+            onClick = { navController.navigate("homeDocente/ ") },
+            icon = { Icon(Icons.Default.Home, contentDescription = "Inicio") },
+            label = { Text("Inicio") },
             colors = NavigationBarItemDefaults.colors(
                 selectedIconColor = Color.Black,
                 selectedTextColor = Color.Black,
@@ -129,10 +147,10 @@ fun BottomNavDocente(navController: NavController) {
             )
         )
         NavigationBarItem(
-            selected = currentRoute == "homeDocente",
-            onClick = { navController.navigate("homeDocente") },
-            icon = { Icon(Icons.Default.Home, contentDescription = "Inicio") },
-            label = { Text("Inicio") },
+            selected = currentRoute == "perfil",
+            onClick = { navController.navigate("perfil") },
+            icon = { Icon(Icons.Default.Person, contentDescription = "Perfil") },
+            label = { Text("Perfil") },
             colors = NavigationBarItemDefaults.colors(
                 selectedIconColor = Color.Black,
                 selectedTextColor = Color.Black,

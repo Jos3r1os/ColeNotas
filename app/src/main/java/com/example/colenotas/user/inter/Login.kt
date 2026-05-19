@@ -8,11 +8,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
+import kotlinx.coroutines.launch
 
 @Composable
 fun LoginScreen(navController: NavController) {
@@ -21,47 +20,82 @@ fun LoginScreen(navController: NavController) {
     var error by remember { mutableStateOf("") }
     var isLoading by remember { mutableStateOf(false) }
 
+    val scope = rememberCoroutineScope()
+
     Column(
         modifier = Modifier.fillMaxSize().padding(32.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
-        OutlinedTextField(value = usuario, onValueChange = { usuario = it }, label = { Text("Correo") }, modifier = Modifier.fillMaxWidth())
-        Spacer(modifier = Modifier.height(16.dp))
-        OutlinedTextField(value = contra, onValueChange = { contra = it }, label = { Text("Contraseña") }, keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password), modifier = Modifier.fillMaxWidth())
+        OutlinedTextField(
+            value = usuario,
+            onValueChange = { usuario = it },
+            label = { Text("Correo") },
+            modifier = Modifier.fillMaxWidth()
+        )
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        if (error.isNotEmpty()) Text(text = error, color = Color.Red)
+        OutlinedTextField(
+            value = contra,
+            onValueChange = { contra = it },
+            label = { Text("Contraseña") },
+            visualTransformation = PasswordVisualTransformation(),
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+            modifier = Modifier.fillMaxWidth()
+        )
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        if (error.isNotEmpty()) {
+            Text(text = error, color = Color.Red)
+        }
+
+        Spacer(modifier = Modifier.height(8.dp))
 
         if (isLoading) {
             CircularProgressIndicator()
         } else {
             Button(
                 onClick = {
-                    isLoading = true
-                    val credenciales = mapOf("correo" to usuario, "clave" to contra)
+                    scope.launch {
+                        isLoading = true
+                        error = ""
+                        try {
+                            val credenciales = mapOf(
+                                "correo" to usuario,
+                                "clave" to contra
+                            )
+                            val respuesta = RetrofitClient.api.login(credenciales)
 
-                    RetrofitClient.instance.login(credenciales).enqueue(object : Callback<UsuarioRespuesta> {
-                        override fun onResponse(call: Call<UsuarioRespuesta>, response: Response<UsuarioRespuesta>) {
-                            isLoading = false
-                            if (response.isSuccessful) {
-                                val user = response.body()
-                                if (user?.rol == "admin") {
-                                    navController.navigate("homeAdmin")
-                                } else {
-                                    navController.navigate("homeDocente")
+                            if (respuesta.isSuccessful) {
+                                val body = respuesta.body()!!
+                                val user = body.usuario
+
+                                val nombreEncoded = (user.nombre ?: "Usuario")
+                                    .replace(" ", "%20")
+
+                                when (user.rol) {
+                                    "admin" -> navController.navigate(
+                                        "homeAdmin/$nombreEncoded"
+                                    ) {
+                                        popUpTo("login") { inclusive = true }
+                                    }
+                                    "docente" -> navController.navigate(
+                                        "homeDocente/$nombreEncoded"
+                                    ) {
+                                        popUpTo("login") { inclusive = true }
+                                    }
+                                    else -> error = "Rol no reconocido"
                                 }
                             } else {
                                 error = "Credenciales incorrectas"
                             }
+                        } catch (e: Exception) {
+                            error = "No se pudo conectar: ${e.message}"
                         }
-
-                        override fun onFailure(call: Call<UsuarioRespuesta>, t: Throwable) {
-                            isLoading = false
-                            error = "Error: " + t.message
-                        }
-                    })
+                        isLoading = false
+                    }
                 },
                 modifier = Modifier.fillMaxWidth()
             ) {

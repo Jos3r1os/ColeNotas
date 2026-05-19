@@ -20,7 +20,7 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 
 @Composable
-fun HomeAdminScreen(navController: NavController) {
+fun HomeAdminScreen(navController: NavController, nombre: String = "") {
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -55,7 +55,7 @@ fun HomeAdminScreen(navController: NavController) {
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
             Text(
-                text = "Administracion 2026",
+                text = "Bienvenido, ${nombre.ifEmpty { "Administrador" }}",
                 fontSize = 16.sp,
                 fontWeight = FontWeight.Bold,
                 modifier = Modifier.padding(bottom = 4.dp)
