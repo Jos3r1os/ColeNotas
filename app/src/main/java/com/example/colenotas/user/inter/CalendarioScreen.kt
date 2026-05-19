@@ -34,7 +34,6 @@ fun CalendarioScreen() {
             .background(Color.White)
     ) {
 
-        // ─── HEADER ───────────────────────────────────
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -58,8 +57,7 @@ fun CalendarioScreen() {
         }
 
         HorizontalDivider()
-
-        // ─── NAVEGACIÓN MES / AÑO ─────────────────────
+        
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -91,7 +89,6 @@ fun CalendarioScreen() {
 
         HorizontalDivider()
 
-        // ─── FORMULARIO ───────────────────────────────
         Column(
             modifier = Modifier
                 .weight(1f)
@@ -112,7 +109,6 @@ fun CalendarioScreen() {
                     modifier = Modifier.padding(bottom = 16.dp)
                 )
 
-                // ── Campo Evento ──────────────────────
                 Text("Evento", fontSize = 13.sp, color = Color.DarkGray)
                 Spacer(modifier = Modifier.height(4.dp))
                 OutlinedTextField(
@@ -125,8 +121,7 @@ fun CalendarioScreen() {
                 )
 
                 Spacer(modifier = Modifier.height(12.dp))
-
-                // ── Campo Fecha ───────────────────────
+                
                 Text("Fecha", fontSize = 13.sp, color = Color.DarkGray)
                 Spacer(modifier = Modifier.height(4.dp))
                 OutlinedTextField(
@@ -169,8 +164,7 @@ fun CalendarioScreen() {
                 }
 
                 Spacer(modifier = Modifier.height(12.dp))
-
-                // ── Campo Comentario ──────────────────
+                
                 Text("Comentario", fontSize = 13.sp, color = Color.DarkGray)
                 Spacer(modifier = Modifier.height(4.dp))
                 OutlinedTextField(
@@ -185,8 +179,7 @@ fun CalendarioScreen() {
                 )
 
                 Spacer(modifier = Modifier.height(12.dp))
-
-                // ── Checkbox Todo el día ──────────────
+                
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Checkbox(
                         checked = todoElDia,
@@ -198,7 +191,6 @@ fun CalendarioScreen() {
 
                 Spacer(modifier = Modifier.height(16.dp))
 
-                // ── Botón Guardar ─────────────────────
                 Button(
                     onClick = {},
                     modifier = Modifier
