@@ -28,6 +28,7 @@ class MainActivity : ComponentActivity() {
     }
 }
 
+//prueba de que funcione de jose
 @Composable
 fun MainApp() {
     val navController = rememberNavController()
