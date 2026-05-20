@@ -13,12 +13,24 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
 @Composable
 fun VentanaCursosScreen() {
+    var cursos by remember { mutableStateOf<List<CursoRespuesta>>(emptyList()) }
+    var cargando by remember { mutableStateOf(true) }
+
+    LaunchedEffect(SesionUsuario.id) {
+        try {
+            val respuesta = RetrofitClient.api.obtenerCursosPorDocente(SesionUsuario.id)
+            if (respuesta.isSuccessful) {
+                cursos = respuesta.body() ?: emptyList()
+            }
+        } catch (e: Exception) { }
+        cargando = false
+    }
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -53,18 +65,35 @@ fun VentanaCursosScreen() {
         ) {
             Text(text = "Tus cursos", fontSize = 14.sp, color = Color.Gray)
             Text(
-                text = "Ingeniero Figueroa",
+                text = SesionUsuario.nombre.ifEmpty { "Docente" },
                 fontSize = 16.sp,
                 fontWeight = FontWeight.Bold,
                 modifier = Modifier.padding(bottom = 16.dp)
             )
 
-            VentanaCursoItem("Calculo I", "Segundo Semestre", "65")
-            VentanaCursoItem("Calculo II", "Tercer Semestre", "40")
-            VentanaCursoItem("Calculo III", "Cuarto Semestre", "3")
-            VentanaCursoItem("Programacion II", "Cuarto Semestre", "30")
-            VentanaCursoItem("Programacion III", "Quinto Semestre", "10")
-            VentanaCursoItem("Redes de Computadoras", "Sexto Semestre", "14")
+            when {
+                cargando -> {
+                    CircularProgressIndicator(
+                        modifier = Modifier.align(Alignment.CenterHorizontally)
+                    )
+                }
+                cursos.isEmpty() -> {
+                    Text(
+                        "No hay cursos asignados.",
+                        fontSize = 14.sp,
+                        color = Color.Gray
+                    )
+                }
+                else -> {
+                    cursos.forEach { curso ->
+                        VentanaCursoItem(
+                            titulo = curso.nombre_curso,
+                            semestre = curso.grado,
+                            numero = ""
+                        )
+                    }
+                }
+            }
         }
     }
 }
@@ -83,21 +112,17 @@ fun VentanaCursoItem(titulo: String, semestre: String, numero: String) {
             Text(text = titulo, fontSize = 14.sp)
             Text(text = semestre, fontSize = 12.sp, color = Color.Gray)
         }
-        Row(verticalAlignment = Alignment.CenterVertically) {
-            Icon(
-                imageVector = Icons.Default.Person,
-                contentDescription = "",
-                modifier = Modifier.size(16.dp),
-                tint = Color.Gray
-            )
-            Text(text = numero, fontSize = 12.sp)
+        if (numero.isNotEmpty()) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Icon(
+                    imageVector = Icons.Default.Person,
+                    contentDescription = "",
+                    modifier = Modifier.size(16.dp),
+                    tint = Color.Gray
+                )
+                Text(text = numero, fontSize = 12.sp)
+            }
         }
     }
     HorizontalDivider(color = Color(0xFFEEEEEE))
-}
-
-@Preview(showBackground = true, showSystemUi = true)
-@Composable
-fun EstaEsLaVentanaCursos() {
-    MaterialTheme { VentanaCursosScreen() }
 }

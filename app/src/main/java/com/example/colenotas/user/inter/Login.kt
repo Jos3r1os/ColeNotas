@@ -72,17 +72,21 @@ fun LoginScreen(navController: NavController) {
                                 val body = respuesta.body()!!
                                 val user = body.usuario
 
-                                val nombreEncoded = (user.nombre ?: "Usuario")
+                                `SesionUsuario`.id = user.id
+                                `SesionUsuario`.nombre = user.nombre ?: "Usuario"
+                                `SesionUsuario`.rol = user.rol
+
+                                val nombreEncoded = `SesionUsuario`.nombre
                                     .replace(" ", "%20")
 
                                 when (user.rol) {
                                     "admin" -> navController.navigate(
-                                        "homeAdmin/$nombreEncoded"
+                                        "homeAdmin/$nombreEncoded/${user.id}"
                                     ) {
                                         popUpTo("login") { inclusive = true }
                                     }
                                     "docente" -> navController.navigate(
-                                        "homeDocente/$nombreEncoded"
+                                        "homeDocente/$nombreEncoded/${user.id}"
                                     ) {
                                         popUpTo("login") { inclusive = true }
                                     }

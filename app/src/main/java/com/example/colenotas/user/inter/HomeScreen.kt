@@ -15,7 +15,24 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
 @Composable
-fun HomeScreen(nombre: String = "") {
+fun HomeScreen(nombre: String = "", docenteId: Int = 0) {
+
+    val idReal = if (docenteId == 0) `SesionUsuario`.id else docenteId
+    val nombreReal = nombre.trim().ifEmpty { `SesionUsuario`.nombre }
+
+    var cursos by remember { mutableStateOf<List<`CursoRespuesta`>>(emptyList()) }
+    var cargando by remember { mutableStateOf(true) }
+
+    LaunchedEffect(idReal) {
+        try {
+            val respuesta = RetrofitClient.api.obtenerCursosPorDocente(idReal)
+            if (respuesta.isSuccessful) {
+                cursos = respuesta.body() ?: emptyList()
+            }
+        } catch (e: Exception) { }
+        cargando = false
+    }
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -51,7 +68,7 @@ fun HomeScreen(nombre: String = "") {
         ) {
             Text(text = "Inicio", fontSize = 14.sp, color = Color.Gray)
             Text(
-                text = nombre.ifEmpty { "Docente" },
+                text = nombreReal.ifEmpty { "Docente" },
                 fontSize = 18.sp,
                 fontWeight = FontWeight.Bold
             )
@@ -63,11 +80,36 @@ fun HomeScreen(nombre: String = "") {
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Column(modifier = Modifier.padding(16.dp)) {
-                    Text("Mis cursos asignados", fontWeight = FontWeight.Bold, fontSize = 15.sp)
+                    Text(
+                        "Mis cursos asignados",
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 15.sp
+                    )
                     Spacer(modifier = Modifier.height(8.dp))
-                    Text("Calculo I — Segundo Semestre", fontSize = 14.sp, color = Color.Gray)
-                    Text("Calculo II — Tercer Semestre", fontSize = 14.sp, color = Color.Gray)
-                    Text("Calculo III — Cuarto Semestre", fontSize = 14.sp, color = Color.Gray)
+
+                    when {
+                        cargando -> {
+                            CircularProgressIndicator(
+                                modifier = Modifier.align(Alignment.CenterHorizontally)
+                            )
+                        }
+                        cursos.isEmpty() -> {
+                            Text(
+                                "No hay cursos asignados.",
+                                fontSize = 14.sp,
+                                color = Color.Gray
+                            )
+                        }
+                        else -> {
+                            cursos.forEach { curso ->
+                                Text(
+                                    "${curso.nombre_curso} — ${curso.grado}",
+                                    fontSize = 14.sp,
+                                    color = Color.Gray
+                                )
+                            }
+                        }
+                    }
                 }
             }
 
@@ -78,7 +120,11 @@ fun HomeScreen(nombre: String = "") {
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Column(modifier = Modifier.padding(16.dp)) {
-                    Text("Avisos recientes", fontWeight = FontWeight.Bold, fontSize = 15.sp)
+                    Text(
+                        "Avisos recientes",
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 15.sp
+                    )
                     Spacer(modifier = Modifier.height(8.dp))
                     Text("No hay avisos nuevos.", fontSize = 14.sp, color = Color.Gray)
                 }

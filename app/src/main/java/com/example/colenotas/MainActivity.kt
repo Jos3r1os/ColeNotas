@@ -68,15 +68,17 @@ fun MainApp() {
             composable("login") {
                 LoginScreen(navController = navController)
             }
-
             composable(
-                route = "homeDocente/{nombre}",
-                arguments = listOf(navArgument("nombre") { type = NavType.StringType })
+                route = "homeDocente/{nombre}/{id}",
+                arguments = listOf(
+                    navArgument("nombre") { type = NavType.StringType },
+                    navArgument("id") { type = NavType.IntType }
+                )
             ) { backStackEntry ->
                 val nombre = backStackEntry.arguments?.getString("nombre") ?: ""
-                HomeScreen(nombre = nombre)
+                val id = backStackEntry.arguments?.getInt("id") ?: 0
+                HomeScreen(nombre = nombre, docenteId = id)
             }
-
             composable("cursos") {
                 VentanaCursosScreen()
             }
@@ -98,15 +100,17 @@ fun MainApp() {
             composable("asignarNotasNotificar") {
                 AsignarNotasNotificarScreen()
             }
-
             composable(
-                route = "homeAdmin/{nombre}",
-                arguments = listOf(navArgument("nombre") { type = NavType.StringType })
+                route = "homeAdmin/{nombre}/{id}",
+                arguments = listOf(
+                    navArgument("nombre") { type = NavType.StringType },
+                    navArgument("id") { type = NavType.IntType }
+                )
             ) { backStackEntry ->
                 val nombre = backStackEntry.arguments?.getString("nombre") ?: ""
+                val id = backStackEntry.arguments?.getInt("id") ?: 0
                 HomeAdminScreen(navController = navController, nombre = nombre)
             }
-
             composable("cursosAdmin") {
                 CursosAdminScreen()
             }
@@ -137,7 +141,10 @@ fun BottomNavDocente(navController: NavController) {
     NavigationBar(containerColor = Color.White) {
         NavigationBarItem(
             selected = currentRoute?.startsWith("homeDocente") == true,
-            onClick = { navController.navigate("homeDocente/ ") },
+            onClick = {
+                val nombreEncoded = SesionUsuario.nombre.replace(" ", "%20")
+                navController.navigate("homeDocente/$nombreEncoded/${SesionUsuario.id}")
+            },
             icon = { Icon(Icons.Default.Home, contentDescription = "Inicio") },
             label = { Text("Inicio") },
             colors = NavigationBarItemDefaults.colors(
