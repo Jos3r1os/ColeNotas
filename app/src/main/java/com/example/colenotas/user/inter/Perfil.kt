@@ -54,7 +54,7 @@ fun PerfilScreen(navController: NavController) {
                         SesionUsuario.fotoUrl = fotoUrl
                         mensajeFoto = "Foto actualizada"
                     } else {
-                        mensajeFoto = "Error al subir la foto"
+                        mensajeFoto = "Error ${respuesta.code()}: ${respuesta.errorBody()?.string()}"
                     }
                 } catch (e: Exception) {
                     mensajeFoto = "Error: ${e.javaClass.simpleName}: ${e.message}"
