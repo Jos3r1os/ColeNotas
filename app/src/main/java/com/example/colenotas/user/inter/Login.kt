@@ -72,11 +72,13 @@ fun LoginScreen(navController: NavController) {
                                 val body = respuesta.body()!!
                                 val user = body.usuario
 
-                                `SesionUsuario`.id = user.id
-                                `SesionUsuario`.nombre = user.nombre ?: "Usuario"
-                                `SesionUsuario`.rol = user.rol
+                                SesionUsuario.id = user.id
+                                SesionUsuario.nombre = user.nombre ?: "Usuario"
+                                SesionUsuario.rol = user.rol
+                                SesionUsuario.correo = usuario
+                                SesionUsuario.fotoUrl = user.foto_url ?: ""
 
-                                val nombreEncoded = `SesionUsuario`.nombre
+                                val nombreEncoded = SesionUsuario.nombre
                                     .replace(" ", "%20")
 
                                 when (user.rol) {

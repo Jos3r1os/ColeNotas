@@ -5,4 +5,5 @@ object SesionUsuario {
     var nombre: String = ""
     var rol: String = ""
     var correo: String = ""
+    var fotoUrl: String = ""
 }

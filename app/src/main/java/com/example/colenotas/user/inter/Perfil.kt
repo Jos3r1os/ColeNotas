@@ -1,5 +1,8 @@
 package com.example.colenotas.user.inter
 
+import android.net.Uri
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -9,13 +12,58 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import coil.compose.AsyncImage
+import kotlinx.coroutines.launch
+import okhttp3.MediaType.Companion.toMediaTypeOrNull
+import okhttp3.MultipartBody
+import okhttp3.RequestBody.Companion.toRequestBody
 
 @Composable
 fun PerfilScreen(navController: NavController) {
+    val context = LocalContext.current
+    val scope = rememberCoroutineScope()
+    var fotoUri by remember { mutableStateOf<Uri?>(null) }
+    var subiendo by remember { mutableStateOf(false) }
+    var mensajeFoto by remember { mutableStateOf("") }
+
+    val launcher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.GetContent()
+    ) { uri: Uri? ->
+        if (uri != null) {
+            fotoUri = uri
+            scope.launch {
+                subiendo = true
+                mensajeFoto = ""
+                try {
+                    val inputStream = context.contentResolver.openInputStream(uri)
+                    val bytes = inputStream?.readBytes() ?: return@launch
+                    inputStream.close()
+
+                    val requestBody = bytes.toRequestBody("image/*".toMediaTypeOrNull())
+                    val part = MultipartBody.Part.createFormData("foto", "foto.jpg", requestBody)
+
+                    val respuesta = RetrofitClient.api.subirFoto(SesionUsuario.id, part)
+                    if (respuesta.isSuccessful) {
+                        val fotoUrl = respuesta.body()?.foto_url ?: ""
+                        SesionUsuario.fotoUrl = fotoUrl
+                        mensajeFoto = "Foto actualizada"
+                    } else {
+                        mensajeFoto = "Error al subir la foto"
+                    }
+                } catch (e: Exception) {
+                    mensajeFoto = "Error: ${e.javaClass.simpleName}: ${e.message}"
+                }
+                subiendo = false
+            }
+        }
+    }
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -56,7 +104,43 @@ fun PerfilScreen(navController: NavController) {
                 .background(Color(0xFFDDDDDD)),
             contentAlignment = Alignment.Center
         ) {
-            Text("📷", fontSize = 48.sp)
+            when {
+                fotoUri != null -> {
+                    AsyncImage(
+                        model = fotoUri,
+                        contentDescription = "Foto de perfil",
+                        modifier = Modifier.fillMaxSize(),
+                        contentScale = ContentScale.Crop
+                    )
+                }
+                SesionUsuario.fotoUrl.isNotEmpty() -> {
+                    AsyncImage(
+                        model = "http://100.95.36.52:3000${SesionUsuario.fotoUrl}",
+                        contentDescription = "Foto de perfil",
+                        modifier = Modifier.fillMaxSize(),
+                        contentScale = ContentScale.Crop
+                    )
+                }
+                else -> {
+                    Text("📷", fontSize = 48.sp)
+                }
+            }
+
+            if (subiendo) {
+                CircularProgressIndicator(
+                    modifier = Modifier.align(Alignment.Center),
+                    color = Color.White
+                )
+            }
+        }
+
+        if (mensajeFoto.isNotEmpty()) {
+            Spacer(modifier = Modifier.height(8.dp))
+            Text(
+                text = mensajeFoto,
+                fontSize = 12.sp,
+                color = if (mensajeFoto.contains("Error")) Color.Red else Color(0xFF1565C0)
+            )
         }
 
         Spacer(modifier = Modifier.height(16.dp))
@@ -107,7 +191,8 @@ fun PerfilScreen(navController: NavController) {
         Spacer(modifier = Modifier.height(16.dp))
 
         Button(
-            onClick = {},
+            onClick = { launcher.launch("image/*") },
+            enabled = !subiendo,
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(horizontal = 24.dp)
@@ -140,6 +225,7 @@ fun PerfilScreen(navController: NavController) {
                 SesionUsuario.nombre = ""
                 SesionUsuario.rol = ""
                 SesionUsuario.correo = ""
+                SesionUsuario.fotoUrl = ""
                 navController.navigate("login") {
                     popUpTo(0) { inclusive = true }
                 }
