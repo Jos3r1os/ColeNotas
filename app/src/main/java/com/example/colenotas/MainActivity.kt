@@ -86,7 +86,7 @@ fun MainApp() {
                 CalendarioScreen()
             }
             composable("perfil") {
-                PerfilScreen()
+                PerfilScreen(navController = navController)
             }
             composable("avisos") {
                 AvisosScreen()

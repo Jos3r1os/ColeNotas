@@ -4,4 +4,5 @@ object SesionUsuario {
     var id: Int = 0
     var nombre: String = ""
     var rol: String = ""
+    var correo: String = ""
 }
