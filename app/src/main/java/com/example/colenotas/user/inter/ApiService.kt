@@ -36,4 +36,7 @@ interface ApiService {
 
     @PATCH("api/avisos/{id}/leido")
     suspend fun marcarComoLeido(@Path("id") id: Int): Response<AvisoRespuesta>
+
+    @GET("api/cursos/docentes")
+    suspend fun obtenerDocentesConCursos(): Response<List<DocenteConCursos>>
 }
