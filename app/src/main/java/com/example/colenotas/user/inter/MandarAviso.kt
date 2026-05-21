@@ -15,13 +15,19 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import kotlinx.coroutines.launch
+import java.time.LocalDate
 
 @Composable
 fun MandarAvisoScreen(navController: NavController) {
-
     var titulo by remember { mutableStateOf("") }
     var mensaje by remember { mutableStateOf("") }
     var urgente by remember { mutableStateOf(false) }
+    var enviando by remember { mutableStateOf(false) }
+    var errorMsg by remember { mutableStateOf("") }
+    var exitoMsg by remember { mutableStateOf("") }
+
+    val scope = rememberCoroutineScope()
 
     Column(
         modifier = Modifier
@@ -105,17 +111,67 @@ fun MandarAvisoScreen(navController: NavController) {
                     Text("Marcar como urgente", fontSize = 14.sp)
                 }
 
+                if (errorMsg.isNotEmpty()) {
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Text(errorMsg, color = Color.Red, fontSize = 13.sp)
+                }
+
+                if (exitoMsg.isNotEmpty()) {
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Text(exitoMsg, color = Color(0xFF1565C0), fontSize = 13.sp)
+                }
+
                 Spacer(modifier = Modifier.height(16.dp))
 
                 Button(
-                    onClick = { navController.popBackStack() },
+                    onClick = {
+                        if (titulo.isEmpty() || mensaje.isEmpty()) {
+                            errorMsg = "El título y mensaje son obligatorios"
+                            return@Button
+                        }
+                        scope.launch {
+                            enviando = true
+                            errorMsg = ""
+                            exitoMsg = ""
+                            try {
+                                val fechaHoy = LocalDate.now().toString()
+                                val request = AvisoRequest(
+                                    titulo = titulo,
+                                    mensaje = mensaje,
+                                    urgente = urgente,
+                                    fecha = fechaHoy,
+                                    admin_id = SesionUsuario.id
+                                )
+                                val respuesta = RetrofitClient.api.crearAviso(request)
+                                if (respuesta.isSuccessful) {
+                                    exitoMsg = "Aviso enviado correctamente"
+                                    titulo = ""
+                                    mensaje = ""
+                                    urgente = false
+                                } else {
+                                    errorMsg = "Error al enviar el aviso"
+                                }
+                            } catch (e: Exception) {
+                                errorMsg = "No se pudo conectar: ${e.message}"
+                            }
+                            enviando = false
+                        }
+                    },
+                    enabled = !enviando,
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(48.dp),
                     shape = RoundedCornerShape(8.dp),
                     colors = ButtonDefaults.buttonColors(containerColor = Color.Black)
                 ) {
-                    Text("Enviar mensaje", color = Color.White, fontWeight = FontWeight.Medium)
+                    if (enviando) {
+                        CircularProgressIndicator(
+                            color = Color.White,
+                            modifier = Modifier.size(20.dp)
+                        )
+                    } else {
+                        Text("Enviar mensaje", color = Color.White, fontWeight = FontWeight.Medium)
+                    }
                 }
             }
         }

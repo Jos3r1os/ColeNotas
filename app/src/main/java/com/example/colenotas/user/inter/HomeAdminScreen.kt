@@ -91,6 +91,28 @@ fun HomeAdminScreen(navController: NavController, nombre: String = "") {
                 subtitulo = "Revisar y aprobar cursos",
                 onClick = { navController.navigate("aprobarCurso") }
             )
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            Button(
+                onClick = {
+                    SesionUsuario.id = 0
+                    SesionUsuario.nombre = ""
+                    SesionUsuario.rol = ""
+                    SesionUsuario.correo = ""
+                    SesionUsuario.fotoUrl = ""
+                    navController.navigate("login") {
+                        popUpTo(0) { inclusive = true }
+                    }
+                },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(52.dp),
+                shape = RoundedCornerShape(10.dp),
+                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFD32F2F))
+            ) {
+                Text("Log Out", color = Color.White, fontSize = 15.sp)
+            }
         }
     }
 }
