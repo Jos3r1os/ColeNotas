@@ -3,6 +3,7 @@ package com.example.colenotas.user.inter
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
@@ -17,17 +18,22 @@ import androidx.compose.ui.unit.sp
 @Composable
 fun HomeScreen(nombre: String = "", docenteId: Int = 0) {
 
-    val idReal = if (docenteId == 0) `SesionUsuario`.id else docenteId
-    val nombreReal = nombre.trim().ifEmpty { `SesionUsuario`.nombre }
+    val idReal = if (docenteId == 0) SesionUsuario.id else docenteId
+    val nombreReal = nombre.trim().ifEmpty { SesionUsuario.nombre }
 
-    var cursos by remember { mutableStateOf<List<`CursoRespuesta`>>(emptyList()) }
+    var cursos by remember { mutableStateOf<List<CursoRespuesta>>(emptyList()) }
+    var avisos by remember { mutableStateOf<List<AvisoRespuesta>>(emptyList()) }
     var cargando by remember { mutableStateOf(true) }
 
     LaunchedEffect(idReal) {
         try {
-            val respuesta = RetrofitClient.api.obtenerCursosPorDocente(idReal)
-            if (respuesta.isSuccessful) {
-                cursos = respuesta.body() ?: emptyList()
+            val respuestaCursos = RetrofitClient.api.obtenerCursosPorDocente(idReal)
+            if (respuestaCursos.isSuccessful) {
+                cursos = respuestaCursos.body() ?: emptyList()
+            }
+            val respuestaAvisos = RetrofitClient.api.obtenerAvisos()
+            if (respuestaAvisos.isSuccessful) {
+                avisos = (respuestaAvisos.body() ?: emptyList()).filter { it.urgente }
             }
         } catch (e: Exception) { }
         cargando = false
@@ -121,12 +127,41 @@ fun HomeScreen(nombre: String = "", docenteId: Int = 0) {
             ) {
                 Column(modifier = Modifier.padding(16.dp)) {
                     Text(
-                        "Avisos recientes",
+                        "Avisos urgentes",
                         fontWeight = FontWeight.Bold,
                         fontSize = 15.sp
                     )
                     Spacer(modifier = Modifier.height(8.dp))
-                    Text("No hay avisos nuevos.", fontSize = 14.sp, color = Color.Gray)
+                    if (avisos.isEmpty()) {
+                        Text("No hay avisos urgentes.", fontSize = 14.sp, color = Color.Gray)
+                    } else {
+                        avisos.forEach { aviso ->
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                                modifier = Modifier.padding(vertical = 4.dp)
+                            ) {
+                                Box(
+                                    modifier = Modifier
+                                        .size(8.dp)
+                                        .background(Color(0xFFD32F2F), CircleShape)
+                                )
+                                Spacer(modifier = Modifier.width(8.dp))
+                                Column {
+                                    Text(
+                                        aviso.titulo,
+                                        fontSize = 14.sp,
+                                        fontWeight = FontWeight.Medium
+                                    )
+                                    Text(
+                                        aviso.mensaje,
+                                        fontSize = 12.sp,
+                                        color = Color.Gray,
+                                        maxLines = 1
+                                    )
+                                }
+                            }
+                        }
+                    }
                 }
             }
         }

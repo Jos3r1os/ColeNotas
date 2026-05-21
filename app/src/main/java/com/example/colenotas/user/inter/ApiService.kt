@@ -48,4 +48,14 @@ interface ApiService {
 
     @DELETE("api/eventos/{id}")
     suspend fun eliminarEvento(@Path("id") id: Int): Response<Unit>
+
+    @GET("api/notas/curso/{cursoId}")
+    suspend fun obtenerAlumnosPorCurso(@Path("cursoId") cursoId: Int): Response<List<AlumnoConNotas>>
+
+    @POST("api/notas/alumno/{alumnoId}/curso/{cursoId}")
+    suspend fun guardarNota(
+        @Path("alumnoId") alumnoId: Int,
+        @Path("cursoId") cursoId: Int,
+        @Body request: NotaRequest
+    ): Response<AlumnoConNotas>
 }

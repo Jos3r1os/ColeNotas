@@ -1,6 +1,7 @@
 package com.example.colenotas.user.inter
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -15,9 +16,10 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
 
 @Composable
-fun VentanaCursosScreen() {
+fun VentanaCursosScreen(navController: NavController) {
     var cursos by remember { mutableStateOf<List<CursoRespuesta>>(emptyList()) }
     var cargando by remember { mutableStateOf(true) }
 
@@ -89,7 +91,10 @@ fun VentanaCursosScreen() {
                         VentanaCursoItem(
                             titulo = curso.nombre_curso,
                             semestre = curso.grado,
-                            numero = ""
+                            onClick = {
+                                val nombreEncoded = curso.nombre_curso.replace(" ", "%20")
+                                navController.navigate("asignarNotas/${curso.id}/$nombreEncoded")
+                            }
                         )
                     }
                 }
@@ -99,10 +104,11 @@ fun VentanaCursosScreen() {
 }
 
 @Composable
-fun VentanaCursoItem(titulo: String, semestre: String, numero: String) {
+fun VentanaCursoItem(titulo: String, semestre: String, onClick: () -> Unit = {}) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
+            .clickable { onClick() }
             .padding(vertical = 10.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
@@ -112,17 +118,11 @@ fun VentanaCursoItem(titulo: String, semestre: String, numero: String) {
             Text(text = titulo, fontSize = 14.sp)
             Text(text = semestre, fontSize = 12.sp, color = Color.Gray)
         }
-        if (numero.isNotEmpty()) {
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Icon(
-                    imageVector = Icons.Default.Person,
-                    contentDescription = "",
-                    modifier = Modifier.size(16.dp),
-                    tint = Color.Gray
-                )
-                Text(text = numero, fontSize = 12.sp)
-            }
-        }
+        Icon(
+            imageVector = Icons.Default.KeyboardArrowRight,
+            contentDescription = "",
+            tint = Color.Gray
+        )
     }
     HorizontalDivider(color = Color(0xFFEEEEEE))
 }

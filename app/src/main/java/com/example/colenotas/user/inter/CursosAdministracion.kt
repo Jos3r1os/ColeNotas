@@ -6,6 +6,8 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -14,9 +16,10 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
 
 @Composable
-fun CursosAdminScreen() {
+fun CursosAdminScreen(navController: NavController) {
     var docentes by remember { mutableStateOf<List<DocenteConCursos>>(emptyList()) }
     var cargando by remember { mutableStateOf(true) }
 
@@ -76,7 +79,7 @@ fun CursosAdminScreen() {
                     Text("No hay docentes registrados.", fontSize = 14.sp, color = Color.Gray)
                 } else {
                     docentes.forEach { docente ->
-                        DocenteItemAdmin(docente = docente)
+                        DocenteItemAdmin(docente = docente, navController = navController)
                         Spacer(modifier = Modifier.height(8.dp))
                     }
                 }
@@ -86,7 +89,7 @@ fun CursosAdminScreen() {
 }
 
 @Composable
-fun DocenteItemAdmin(docente: DocenteConCursos) {
+fun DocenteItemAdmin(docente: DocenteConCursos, navController: NavController) {
     val cursos = docente.cursos ?: emptyList()
     var expandido by remember { mutableStateOf(false) }
 
@@ -108,14 +111,25 @@ fun DocenteItemAdmin(docente: DocenteConCursos) {
                 }
             }
             Row(verticalAlignment = Alignment.CenterVertically) {
-                Text("☆", fontSize = 14.sp, color = Color.Gray)
                 Text("${cursos.size}", fontSize = 14.sp, color = Color.Gray)
+                Icon(
+                    imageVector = if (expandido) Icons.Default.KeyboardArrowUp
+                    else Icons.Default.KeyboardArrowDown,
+                    contentDescription = "",
+                    tint = Color.Gray
+                )
             }
         }
 
         if (expandido) {
             cursos.forEach { curso ->
-                AdminCursoItemDatos(curso = curso)
+                AdminCursoItemDatos(
+                    curso = curso,
+                    onClick = {
+                        val nombreEncoded = curso.nombre_curso.replace(" ", "%20")
+                        navController.navigate("verNotasAdmin/${curso.id}/$nombreEncoded")
+                    }
+                )
             }
         }
 
@@ -124,11 +138,12 @@ fun DocenteItemAdmin(docente: DocenteConCursos) {
 }
 
 @Composable
-fun AdminCursoItemDatos(curso: CursoRespuesta) {
+fun AdminCursoItemDatos(curso: CursoRespuesta, onClick: () -> Unit = {}) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(start = 32.dp, top = 6.dp, bottom = 6.dp),
+            .clickable { onClick() }
+            .padding(start = 32.dp, top = 6.dp, bottom = 6.dp, end = 8.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
@@ -140,5 +155,10 @@ fun AdminCursoItemDatos(curso: CursoRespuesta) {
                 Text(curso.grado, fontSize = 12.sp, color = Color.Gray)
             }
         }
+        Icon(
+            imageVector = Icons.Default.KeyboardArrowRight,
+            contentDescription = "",
+            tint = Color.Gray
+        )
     }
 }

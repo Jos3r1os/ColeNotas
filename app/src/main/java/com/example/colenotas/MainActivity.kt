@@ -28,7 +28,6 @@ class MainActivity : ComponentActivity() {
     }
 }
 
-//prueba de que funcione de jose
 @Composable
 fun MainApp() {
     val navController = rememberNavController()
@@ -44,7 +43,8 @@ fun MainApp() {
         "registroEventoAdmin",
         "aprobarCurso",
         "mandarAviso",
-        "verEventosAdmin"
+        "verEventosAdmin",
+        "verNotasAdmin"
     )
 
     val currentRoute = navController
@@ -81,7 +81,7 @@ fun MainApp() {
                 HomeScreen(nombre = nombre, docenteId = id)
             }
             composable("cursos") {
-                VentanaCursosScreen()
+                VentanaCursosScreen(navController = navController)
             }
             composable("calendario") {
                 CalendarioScreen()
@@ -95,8 +95,16 @@ fun MainApp() {
             composable("registroEvento") {
                 RegistroEventoScreen(navController = navController)
             }
-            composable("asignarNotas") {
-                AsignarNotasScreen()
+            composable(
+                route = "asignarNotas/{cursoId}/{nombreCurso}",
+                arguments = listOf(
+                    navArgument("cursoId") { type = NavType.IntType },
+                    navArgument("nombreCurso") { type = NavType.StringType }
+                )
+            ) { backStackEntry ->
+                val cursoId = backStackEntry.arguments?.getInt("cursoId") ?: 0
+                val nombreCurso = backStackEntry.arguments?.getString("nombreCurso") ?: ""
+                AsignarNotasScreen(cursoId = cursoId, nombreCurso = nombreCurso)
             }
             composable("asignarNotasNotificar") {
                 AsignarNotasNotificarScreen()
@@ -113,7 +121,7 @@ fun MainApp() {
                 HomeAdminScreen(navController = navController, nombre = nombre)
             }
             composable("cursosAdmin") {
-                CursosAdminScreen()
+                CursosAdminScreen(navController = navController)
             }
             composable("avisosAdmin") {
                 AvisosAdministracionScreen(navController = navController)
@@ -129,6 +137,17 @@ fun MainApp() {
             }
             composable("verEventosAdmin") {
                 VerEventosAdminScreen(navController = navController)
+            }
+            composable(
+                route = "verNotasAdmin/{cursoId}/{nombreCurso}",
+                arguments = listOf(
+                    navArgument("cursoId") { type = NavType.IntType },
+                    navArgument("nombreCurso") { type = NavType.StringType }
+                )
+            ) { backStackEntry ->
+                val cursoId = backStackEntry.arguments?.getInt("cursoId") ?: 0
+                val nombreCurso = backStackEntry.arguments?.getString("nombreCurso") ?: ""
+                VerNotasAdminScreen(cursoId = cursoId, nombreCurso = nombreCurso)
             }
         }
     }
