@@ -13,22 +13,28 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import androidx.navigation.compose.rememberNavController
+import kotlinx.coroutines.launch
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun RegistroEventoAdministracionScreen(navController: NavController) {
-
     var nombreEvento by remember { mutableStateOf("") }
     var fecha by remember { mutableStateOf("") }
+    var fechaApi by remember { mutableStateOf("") }
     var comentario by remember { mutableStateOf("") }
     var todoElDia by remember { mutableStateOf(false) }
     var calendarioPicker by remember { mutableStateOf(false) }
+    var guardando by remember { mutableStateOf(false) }
+    var errorMsg by remember { mutableStateOf("") }
+    var exitoMsg by remember { mutableStateOf("") }
     val datePickerState = rememberDatePickerState()
+    val scope = rememberCoroutineScope()
 
     Column(
         modifier = Modifier
@@ -52,7 +58,7 @@ fun RegistroEventoAdministracionScreen(navController: NavController) {
         }
 
         HorizontalDivider()
-        Spacer(modifier = Modifier.height(55.dp))
+        Spacer(modifier = Modifier.height(16.dp))
 
         Column(
             modifier = Modifier
@@ -102,8 +108,10 @@ fun RegistroEventoAdministracionScreen(navController: NavController) {
                             TextButton(onClick = {
                                 val millis = datePickerState.selectedDateMillis
                                 if (millis != null) {
-                                    val sdf = java.text.SimpleDateFormat("dd/MM/yyyy", java.util.Locale.getDefault())
-                                    fecha = sdf.format(java.util.Date(millis))
+                                    val sdfDisplay = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
+                                    val sdfApi = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+                                    fecha = sdfDisplay.format(Date(millis))
+                                    fechaApi = sdfApi.format(Date(millis))
                                 }
                                 calendarioPicker = false
                             }) { Text("Confirmar") }
@@ -138,34 +146,67 @@ fun RegistroEventoAdministracionScreen(navController: NavController) {
                     Text("Todo el día?", fontSize = 14.sp)
                 }
 
+                if (errorMsg.isNotEmpty()) {
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Text(errorMsg, color = Color.Red, fontSize = 13.sp)
+                }
+
+                if (exitoMsg.isNotEmpty()) {
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Text(exitoMsg, color = Color(0xFF1565C0), fontSize = 13.sp)
+                }
+
                 Spacer(modifier = Modifier.height(16.dp))
 
                 Button(
-                    onClick = { navController.popBackStack() },
+                    onClick = {
+                        if (nombreEvento.isEmpty() || fechaApi.isEmpty()) {
+                            errorMsg = "El nombre y la fecha son obligatorios"
+                            return@Button
+                        }
+                        scope.launch {
+                            guardando = true
+                            errorMsg = ""
+                            exitoMsg = ""
+                            try {
+                                val request = EventoRequest(
+                                    nombre = nombreEvento,
+                                    fecha = fechaApi,
+                                    comentario = comentario,
+                                    todo_el_dia = todoElDia,
+                                    creado_por = SesionUsuario.id
+                                )
+                                val respuesta = RetrofitClient.api.crearEvento(request)
+                                if (respuesta.isSuccessful) {
+                                    exitoMsg = "Evento guardado correctamente"
+                                    nombreEvento = ""
+                                    fecha = ""
+                                    fechaApi = ""
+                                    comentario = ""
+                                    todoElDia = false
+                                } else {
+                                    errorMsg = "Error al guardar el evento"
+                                }
+                            } catch (e: Exception) {
+                                errorMsg = "No se pudo conectar: ${e.message}"
+                            }
+                            guardando = false
+                        }
+                    },
+                    enabled = !guardando,
                     modifier = Modifier.fillMaxWidth().height(48.dp),
                     shape = RoundedCornerShape(8.dp),
                     colors = ButtonDefaults.buttonColors(containerColor = Color.Black)
                 ) {
-                    Text("Guardar evento", color = Color.White, fontWeight = FontWeight.Medium)
+                    if (guardando) {
+                        CircularProgressIndicator(color = Color.White, modifier = Modifier.size(20.dp))
+                    } else {
+                        Text("Guardar evento", color = Color.White, fontWeight = FontWeight.Medium)
+                    }
                 }
 
                 Spacer(modifier = Modifier.height(16.dp))
-
-                Button(
-                    onClick = {},
-                    modifier = Modifier.fillMaxWidth().height(48.dp),
-                    shape = RoundedCornerShape(8.dp),
-                    colors = ButtonDefaults.buttonColors(containerColor = Color.Red)
-                ) {
-                    Text("Asignar a todos los maestros", color = Color.White, fontWeight = FontWeight.Medium)
-                }
             }
         }
     }
-}
-
-@Preview(showBackground = true, showSystemUi = true)
-@Composable
-fun RegistroEventoAdministracionScreenPreview() {
-    RegistroEventoAdministracionScreen(navController = rememberNavController())
 }

@@ -39,4 +39,13 @@ interface ApiService {
 
     @GET("api/cursos/docentes")
     suspend fun obtenerDocentesConCursos(): Response<List<DocenteConCursos>>
+
+    @GET("api/eventos")
+    suspend fun obtenerEventos(): Response<List<EventoRespuesta>>
+
+    @POST("api/eventos")
+    suspend fun crearEvento(@Body request: EventoRequest): Response<EventoRespuesta>
+
+    @DELETE("api/eventos/{id}")
+    suspend fun eliminarEvento(@Path("id") id: Int): Response<Unit>
 }
