@@ -58,4 +58,19 @@ interface ApiService {
         @Path("cursoId") cursoId: Int,
         @Body request: NotaRequest
     ): Response<AlumnoConNotas>
+
+    @POST("api/usuarios/docente")
+    suspend fun crearDocente(@Body request: Map<String, String>): Response<DocenteRespuesta>
+
+    @POST("api/usuarios/curso")
+    suspend fun asignarCurso(@Body request: Map<String, String>): Response<CursoRespuesta>
+
+    @POST("api/usuarios/alumno")
+    suspend fun crearAlumno(@Body request: Map<String, String>): Response<DocenteRespuesta>
+
+    @POST("api/usuarios/inscribir")
+    suspend fun inscribirAlumno(@Body request: Map<String, String>): Response<Unit>
+
+    @GET("api/cursos/")
+    suspend fun obtenerTodosLosCursos(): Response<List<CursoRespuesta>>
 }

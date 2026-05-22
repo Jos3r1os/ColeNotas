@@ -33,57 +33,73 @@ fun CursosAdminScreen(navController: NavController) {
         cargando = false
     }
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(Color.White)
-    ) {
-        Row(
-            modifier = Modifier.fillMaxWidth().padding(16.dp),
-            verticalAlignment = Alignment.CenterVertically
+    Box(modifier = Modifier.fillMaxSize()) {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(Color.White)
         ) {
-            Box(
-                modifier = Modifier
-                    .size(40.dp)
-                    .background(Color(0xFFDDDDDD), RoundedCornerShape(50)),
-                contentAlignment = Alignment.Center
+            Row(
+                modifier = Modifier.fillMaxWidth().padding(16.dp),
+                verticalAlignment = Alignment.CenterVertically
             ) {
-                Text("🏫", fontSize = 20.sp)
+                Box(
+                    modifier = Modifier
+                        .size(40.dp)
+                        .background(Color(0xFFDDDDDD), RoundedCornerShape(50)),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text("🏫", fontSize = 20.sp)
+                }
+                Spacer(modifier = Modifier.width(8.dp))
+                Text(text = "Cursos por docente", fontSize = 18.sp, fontWeight = FontWeight.Bold)
             }
-            Spacer(modifier = Modifier.width(8.dp))
-            Text(text = "Cursos por docente", fontSize = 18.sp, fontWeight = FontWeight.Bold)
-        }
 
-        HorizontalDivider()
+            HorizontalDivider()
 
-        if (cargando) {
-            Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                CircularProgressIndicator()
-            }
-        } else {
-            Column(
-                modifier = Modifier
-                    .weight(1f)
-                    .verticalScroll(rememberScrollState())
-                    .padding(horizontal = 16.dp, vertical = 12.dp)
-            ) {
-                Text(text = "Docentes", fontSize = 12.sp, color = Color.Gray)
-                Text(
-                    text = "Administracion 2026",
-                    fontSize = 15.sp,
-                    fontWeight = FontWeight.Bold,
-                    modifier = Modifier.padding(bottom = 12.dp)
-                )
+            if (cargando) {
+                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                    CircularProgressIndicator()
+                }
+            } else {
+                Column(
+                    modifier = Modifier
+                        .weight(1f)
+                        .verticalScroll(rememberScrollState())
+                        .padding(horizontal = 16.dp, vertical = 12.dp)
+                ) {
+                    Text(text = "Docentes", fontSize = 12.sp, color = Color.Gray)
+                    Text(
+                        text = "Administracion 2026",
+                        fontSize = 15.sp,
+                        fontWeight = FontWeight.Bold,
+                        modifier = Modifier.padding(bottom = 12.dp)
+                    )
 
-                if (docentes.isEmpty()) {
-                    Text("No hay docentes registrados.", fontSize = 14.sp, color = Color.Gray)
-                } else {
-                    docentes.forEach { docente ->
-                        DocenteItemAdmin(docente = docente, navController = navController)
-                        Spacer(modifier = Modifier.height(8.dp))
+                    if (docentes.isEmpty()) {
+                        Text("No hay docentes registrados.", fontSize = 14.sp, color = Color.Gray)
+                    } else {
+                        docentes.forEach { docente ->
+                            DocenteItemAdmin(docente = docente, navController = navController)
+                            Spacer(modifier = Modifier.height(8.dp))
+                        }
                     }
                 }
             }
+        }
+
+        FloatingActionButton(
+            onClick = { navController.navigate("agregarDocente") },
+            modifier = Modifier
+                .align(Alignment.BottomEnd)
+                .padding(16.dp),
+            containerColor = Color(0xFF2C2C2C)
+        ) {
+            Icon(
+                imageVector = Icons.Default.Add,
+                contentDescription = "Agregar docente",
+                tint = Color.White
+            )
         }
     }
 }

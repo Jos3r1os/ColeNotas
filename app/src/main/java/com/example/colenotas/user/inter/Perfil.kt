@@ -206,20 +206,6 @@ fun PerfilScreen(navController: NavController) {
         Spacer(modifier = Modifier.height(12.dp))
 
         Button(
-            onClick = {},
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 24.dp)
-                .height(52.dp),
-            shape = RoundedCornerShape(10.dp),
-            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF2C2C2C))
-        ) {
-            Text("Vincular con Google", color = Color.White, fontSize = 15.sp)
-        }
-
-        Spacer(modifier = Modifier.height(12.dp))
-
-        Button(
             onClick = {
                 SesionUsuario.id = 0
                 SesionUsuario.nombre = ""

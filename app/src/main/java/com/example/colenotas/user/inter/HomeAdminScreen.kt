@@ -85,7 +85,12 @@ fun HomeAdminScreen(navController: NavController, nombre: String = "") {
                 subtitulo = "Enviar mensaje a docentes",
                 onClick = { navController.navigate("mandarAviso") }
             )
-
+            AdminMenuItem(
+                icono = Icons.Default.Person,
+                titulo = "Agregar alumno",
+                subtitulo = "Registrar nuevo alumno",
+                onClick = { navController.navigate("agregarAlumno") }
+            )
 
             Spacer(modifier = Modifier.height(8.dp))
 

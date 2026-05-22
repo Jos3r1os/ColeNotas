@@ -44,7 +44,9 @@ fun MainApp() {
         "aprobarCurso",
         "mandarAviso",
         "verEventosAdmin",
-        "verNotasAdmin"
+        "verNotasAdmin",
+        "agregarDocente",
+        "agregarAlumno"
     )
 
     val currentRoute = navController
@@ -148,6 +150,12 @@ fun MainApp() {
                 val cursoId = backStackEntry.arguments?.getInt("cursoId") ?: 0
                 val nombreCurso = backStackEntry.arguments?.getString("nombreCurso") ?: ""
                 VerNotasAdminScreen(cursoId = cursoId, nombreCurso = nombreCurso)
+            }
+            composable("agregarDocente") {
+                AgregarDocenteScreen(navController = navController)
+            }
+            composable("agregarAlumno") {
+                AgregarAlumnoScreen(navController = navController)
             }
         }
     }
